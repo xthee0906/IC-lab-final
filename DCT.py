@@ -63,8 +63,8 @@ def CheckValue(image, channel):
 
 
 # Load the image & image1
-image = cv2.resize(cv2.imread('../data/EE4292.png'), (256,144)) # hybrid for low
-image1 = cv2.resize(cv2.imread('../data/number.png'), (256,144)) # hybrid for high
+image = cv2.resize(cv2.imread('data/EE4292.png'), (256,144)) # hybrid for low
+image1 = cv2.resize(cv2.imread('data/number.png'), (256,144)) # hybrid for high
 print('Image size: ' + str(image.shape[1]) +'x' + str(image.shape[0]))
 
 # adjust the quantization table, multi ver. for convenience (1 save 0 discard)
