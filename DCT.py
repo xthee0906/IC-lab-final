@@ -14,24 +14,24 @@ def dct_matrix(size):
     return dct_mat
 
 def DCT_matrix_ver(image, size):
-    dct_image = np.zeros_like(image)
-    idct_image = np.zeros_like(image)
+    dct_image = np.zeros_like(image).astype(int)
+    idct_image = np.zeros_like(image).astype(int)
     image_height, image_width, image_channels = image.shape
-    image_YCbCr = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)    # to YCbCr
+    image_YCbCr = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb).astype(int)    # to YCbCr
     dct_matrix_8x8 = dct_matrix(size)
     for i in range(0, image_height, size):
         for j in range(0, image_width, size):
             for ch in range(image_channels):
                 block = image_YCbCr[i:i+size, j:j+size, ch]
-                block = block.astype(np.float32) - 128.0
+                block = block - 128.0
                 block_dct = dct_matrix_8x8 @ block @ dct_matrix_8x8.T
-                dct_image[i:i+size, j:j+size, ch] = block_dct
-
+                dct_image[i:i+size, j:j+size, ch] = np.round(block_dct)
                 # Inverse DCT with quantization
-                block_idct = dct_matrix_8x8.T @ (block_dct * quantization_table) @ dct_matrix_8x8
+                block_idct = dct_matrix_8x8.T @ (dct_image[i:i+size, j:j+size, ch] * quantization_table) @ dct_matrix_8x8
                 block_idct = block_idct.astype(np.float32) + 128.0
-                idct_image[i:i+size, j:j+size, ch] = block_idct
-    return dct_image, cv2.cvtColor(idct_image, cv2.COLOR_YCrCb2BGR)
+                idct_image[i:i+size, j:j+size, ch] = block_idct.astype(int)
+    CheckValue(dct_image,0)
+    return dct_image.astype(np.uint8), cv2.cvtColor(idct_image.astype(np.uint8), cv2.COLOR_YCrCb2BGR)
 
 def DCT_opencv_ver(image, size):
     dct_image = np.zeros_like(image)
