@@ -23,9 +23,9 @@ def YCbCr_table(image):
     Cb = B*112 - R*38  - G*74 + 32768
     Cr = R*112 - G*94  - B*18 + 32768
     
-    image_YCbCr[:,:,0] = np.round(Y/256)
-    image_YCbCr[:,:,1] = np.round(Cb/256)
-    image_YCbCr[:,:,2] = np.round(Cr/256)
+    image_YCbCr[:,:,0] = np.floor(Y/256 + 0.5)
+    image_YCbCr[:,:,1] = np.floor(Cb/256 + 0.5)
+    image_YCbCr[:,:,2] = np.floor(Cr/256 + 0.5)
 
     return image_YCbCr.astype(np.uint8)
 
@@ -33,9 +33,9 @@ def DCT(block):
     dct_matrix_8x8 = dct_matrix()
     block = block - 128
     block_dct_1 = block @ dct_matrix_8x8.T
-    block_dct_rounded_1 = np.round(block_dct_1/16384)
+    block_dct_rounded_1 = np.floor(block_dct_1/16384 + 0.5)
     block_dct_2 = dct_matrix_8x8 @ block_dct_rounded_1
-    block_dct_rounded_2 = np.round(block_dct_2/16384)
+    block_dct_rounded_2 = np.floor(block_dct_2/16384 + 0.5)
 
     return block_dct_rounded_2
 
@@ -47,13 +47,13 @@ def DCT_matrix_ver(image_YCbCr):
         for j in range(0, image_width, 8):
             for ch in range(image_channels):
                 block = image_YCbCr[i:i+8, j:j+8, ch].astype(int)
-                dct_image[i:i+8, j:j+8, ch] = np.round(DCT(block))
+                dct_image[i:i+8, j:j+8, ch] = np.floor(DCT(block) + 0.5)
 
     return dct_image
 
 def get_RGB_dataset(image, mode):
     image_height, image_width, _ = image.shape
-    output_file_path = 'SRAM_RGB.dat'
+    output_file_path = './dataset/SRAM_RGB.dat'
     with open(output_file_path, 'w') as file:
         for i in range(0, image_height, 8):
             for j in range(0, image_width, 8):
@@ -96,7 +96,7 @@ def get_RGB_dataset(image, mode):
 
 def get_YCbCr_datset(image, mode):
     image_height, image_width, _ = image.shape
-    output_file_path = 'SRAM_YCbCr.dat'
+    output_file_path = './dataset/SRAM_YCbCr.dat'
     with open(output_file_path, 'w') as file:
         for i in range(0, image_height, 8):
             for j in range(0, image_width, 8):
@@ -139,7 +139,7 @@ def get_YCbCr_datset(image, mode):
 
 def get_DCT_datset(image, mode):
     image_height, image_width, _ = image.shape
-    output_file_path = 'SRAM_DCT.dat'
+    output_file_path = './dataset/SRAM_DCT.dat'
     with open(output_file_path, 'w') as file:
         for i in range(0, image_height, 8):
             for j in range(0, image_width, 8):
@@ -181,76 +181,172 @@ def get_DCT_datset(image, mode):
                 file.write('\n')
 
 def get_RGB_golden_forcheck(image):
+    c = 0
+    a = 0
     B_channel_values = image[:, :, 0] # B
     G_channel_values = image[:, :, 1] # G
     R_channel_values = image[:, :, 2] # R
-    output_file_path = 'R_channel_values.txt'
+    output_file_path = './dataset/R_channel_values.txt'
     with open(output_file_path, 'w') as file:
         for row in R_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 
-    output_file_path = 'G_channel_values.txt'
+    output_file_path = './dataset/G_channel_values.txt'
     with open(output_file_path, 'w') as file:
         for row in G_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 
-    output_file_path = 'B_channel_values.txt'
+    output_file_path = './dataset/B_channel_values.txt'
     with open(output_file_path, 'w') as file:
         for row in B_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 def get_YCbCr_golden_forcheck(image):
+    c = 0
+    a = 0
     Y_channel_values = image[:, :, 0] # Y
     Cb_channel_values = image[:, :, 1] # Cb
     Cr_channel_values = image[:, :, 2] # Cr
-    output_file_path = 'Y_channel_values.txt'
+    output_file_path = './dataset/Y_channel_values.txt'
     with open(output_file_path, 'w') as file:
         for row in Y_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 
-    output_file_path = 'Cb_channel_values.txt'
+    output_file_path = './dataset/Cb_channel_values.txt'
     with open(output_file_path, 'w') as file:
         for row in Cb_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 
-    output_file_path = 'Cr_channel_values.txt'
+    output_file_path = './dataset/Cr_channel_values.txt'
     with open(output_file_path, 'w') as file:
         for row in Cr_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 def get_DCT_golden_forcheck(image):
+    c = 0
+    a = 0
     Y_channel_values = image[:, :, 0]  # Y
     Cb_channel_values = image[:, :, 1] # Cb
     Cr_channel_values = image[:, :, 2] # Cr
-    output_file_path = 'Y_channel_DCTvalues.txt'
+    output_file_path = './dataset/DCT_channel_Y_values.txt'
     with open(output_file_path, 'w') as file:
         for row in Y_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 
-    output_file_path = 'Cb_channel_DCTvalues.txt'
+    output_file_path = './dataset/DCT_channel_Cb_values.txt'
     with open(output_file_path, 'w') as file:
         for row in Cb_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 
-    output_file_path = 'Cr_channel_DCTvalues.txt'
+    output_file_path = './dataset/DCT_channel_Cr_values.txt'
     with open(output_file_path, 'w') as file:
         for row in Cr_channel_values:
             for value in row:
-                file.write(str(value) + '\n')
+                c = c + 1
+                file.write(str(value).rjust(4) + ' ')
+                if (c == 8):
+                    file.write('||')
+                    c = 0
+            file.write('\n')
+            a = a+1
+            if (a == 8):
+                file.write('-'*1024)
+                file.write('\n')
+                a = 0
 
 def checkvalue(file_path, addr):
     with open(file_path, 'r') as file:
@@ -259,6 +355,51 @@ def checkvalue(file_path, addr):
         print(file_path +' in addr.'+ str(addr))
         print(value)
 
+def checkblock(addr):
+    with open('dataset/SRAM_DCT.dat', 'r') as file:
+        lines = file.readlines()
+        value = lines[addr]
+        a = value.split(' ')
+    with open('dataset/SRAM_YCbCr.dat', 'r') as file:
+        lines = file.readlines()
+        value = lines[addr]
+        b = value.split(' ')
+    with open('dataset/SRAM_RGB.dat', 'r') as file:
+        lines = file.readlines()
+        value = lines[addr]
+        c = value.split(' ')
+    with open('block_check.txt', 'w') as file:
+        file.write(f'SRAM_addr_'+ str(addr) + ':\n')
+        if (addr % 3 == 0):
+            file.write(f'R_blcok_addr_'+ str(addr//3) + ':\n')
+        elif (addr % 3 == 1):
+            file.write(f'G_blcok_addr_'+ str(addr//3) + ':\n')
+        else:
+            file.write(f'B_blcok_addr_'+ str(addr//3) + ':\n')
+        for i in range(8):
+            for j in range(8):
+                file.write(f'{c[i*8 + j].rjust(4)} ')
+            file.write('\n')
+        if (addr % 3 == 0):
+            file.write(f'Y_blcok_addr_'+ str(addr//3) + ':\n')
+        elif (addr % 3 == 1):
+            file.write(f'Cb_blcok_addr_'+ str(addr//3) + ':\n')
+        else:
+            file.write(f'Cr_blcok_addr_'+ str(addr//3) + ':\n')
+        for i in range(8):
+            for j in range(8):
+                file.write(f'{b[i*8 + j].rjust(4)} ')
+            file.write('\n')
+        if (addr % 3 == 0):
+            file.write(f'DCT_Y_blcok_addr_'+ str(addr//3) + ':\n')
+        elif (addr % 3 == 1):
+            file.write(f'DCT_Cb_blcok_addr_'+ str(addr//3) + ':\n')
+        else:
+            file.write(f'DCT_Cr_blcok_addr_'+ str(addr//3) + ':\n')
+        for i in range(8):
+            for j in range(8):
+                file.write(f'{a[i*8 + j].rjust(4)} ')
+            file.write('\n')
 
 
 # mode = 3 # fill bit
@@ -267,19 +408,23 @@ def checkvalue(file_path, addr):
 # mode = 0 # deciaml
 image = cv2.resize(cv2.imread('../data/cat.bmp'), (256, 144))
 get_RGB_golden_forcheck(image)
-get_RGB_dataset(image, mode = 1)
-file_path = 'SRAM_RGB.dat'
+get_RGB_dataset(image, mode = 0)
+file_path = './dataset/SRAM_RGB.dat'
 checkvalue(file_path, addr = 0)
 
 
 image_YCbCr = YCbCr_table(image)
 get_YCbCr_golden_forcheck(image_YCbCr)
-get_YCbCr_datset(image_YCbCr, mode = 1)
-file_path = 'SRAM_YCbCr.dat'
+get_YCbCr_datset(image_YCbCr, mode = 0)
+file_path = './dataset/SRAM_YCbCr.dat'
 checkvalue(file_path, addr = 0)
 
 DCT_image = DCT_matrix_ver(image_YCbCr)
 get_DCT_golden_forcheck(DCT_image)
-get_DCT_datset(DCT_image, mode = 1)
-file_path = 'SRAM_DCT.dat'
+get_DCT_datset(DCT_image, mode = 0)
+file_path = './dataset/SRAM_DCT.dat'
 checkvalue(file_path, addr = 0)
+#   0
+#  96
+# 192
+checkblock(192)
