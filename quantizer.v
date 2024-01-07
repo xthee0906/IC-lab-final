@@ -5,6 +5,7 @@ module quantizer(
 	input		clk,
 	input		srst_n,
 	input		enable,
+	input		mode,
 	input  [`N:0]  dct11, dct12, dct13, dct14, dct15, dct16, dct17, dct18, 
 	input  [`N:0]  dct21, dct22, dct23, dct24, dct25, dct26, dct27, dct28,
 	input  [`N:0]  dct31, dct32, dct33, dct34, dct35, dct36, dct37, dct38,
@@ -23,71 +24,81 @@ module quantizer(
 	output reg  [`N:0]  q81, q82, q83, q84, q85, q86, q87, q88,
 	output reg  vaild
 );
+reg mode_reg;
 
-parameter q1_1 = 1;
-parameter q1_2 = 10;
-parameter q1_3 = 30;
-parameter q1_4 = 256;
-parameter q1_5 = 5;
-parameter q1_6 = 256;
-parameter q1_7 = 256;
-parameter q1_8 = 256;
-parameter q2_1 = 15;
-parameter q2_2 = 15;
-parameter q2_3 = 256;
-parameter q2_4 = 256;
-parameter q2_5 = 256;
-parameter q2_6 = 256;
-parameter q2_7 = 256;
-parameter q2_8 = 256;
-parameter q3_1 = 30;
-parameter q3_2 = 30;
-parameter q3_3 = 256;
-parameter q3_4 = 256;
-parameter q3_5 = 256;
-parameter q3_6 = 256;
-parameter q3_7 = 256;
-parameter q3_8 = 256;
-parameter q4_1 = 256;
-parameter q4_2 = 256;
-parameter q4_3 = 256;
-parameter q4_4 = 256;
-parameter q4_5 = 256;
-parameter q4_6 = 256;
-parameter q4_7 = 256;
-parameter q4_8 = 256;
-parameter q5_1 = 256;
-parameter q5_2 = 256;
-parameter q5_3 = 256;
-parameter q5_4 = 256;
-parameter q5_5 = 256;
-parameter q5_6 = 256;
-parameter q5_7 = 256;
-parameter q5_8 = 256;
-parameter q6_1 = 256;
-parameter q6_2 = 256;
-parameter q6_3 = 256;
-parameter q6_4 = 256;
-parameter q6_5 = 256;
-parameter q6_6 = 256;
-parameter q6_7 = 256;
-parameter q6_8 = 256;
-parameter q7_1 = 256;
-parameter q7_2 = 256;
-parameter q7_3 = 256;
-parameter q7_4 = 256;
-parameter q7_5 = 256;
-parameter q7_6 = 256;
-parameter q7_7 = 256;
-parameter q7_8 = 256;
-parameter q8_1 = 256;
-parameter q8_2 = 256;
-parameter q8_3 = 256;
-parameter q8_4 = 256;
-parameter q8_5 = 256;
-parameter q8_6 = 256;
-parameter q8_7 = 256;
-parameter q8_8 = 256;
+wire [10:0] q1_1, q1_2, q1_3, q1_4, q1_5, q1_6, q1_7, q1_8;
+wire [10:0] q2_1, q2_2, q2_3, q2_4, q2_5, q2_6, q2_7, q2_8;
+wire [10:0] q3_1, q3_2, q3_3, q3_4, q3_5, q3_6, q3_7, q3_8;
+wire [10:0] q4_1, q4_2, q4_3, q4_4, q4_5, q4_6, q4_7, q4_8;
+wire [10:0] q5_1, q5_2, q5_3, q5_4, q5_5, q5_6, q5_7, q5_8;
+wire [10:0] q6_1, q6_2, q6_3, q6_4, q6_5, q6_6, q6_7, q6_8;
+wire [10:0] q7_1, q7_2, q7_3, q7_4, q7_5, q7_6, q7_7, q7_8;
+wire [10:0] q8_1, q8_2, q8_3, q8_4, q8_5, q8_6, q8_7, q8_8;
+
+assign q1_1 = mode_reg ? 16: 16;
+assign q1_2 = mode_reg ? 32: 32;
+assign q1_3 = mode_reg ? 64: 64;
+assign q1_4 = mode_reg ? 64: 128;
+assign q1_5 = mode_reg ? 512: 512;
+assign q1_6 = mode_reg ? 512: 512;
+assign q1_7 = mode_reg ? 512: 512;
+assign q1_8 = mode_reg ? 512: 512;
+assign q2_1 = mode_reg ? 32: 32;
+assign q2_2 = mode_reg ? 64: 64;
+assign q2_3 = mode_reg ? 64: 512;
+assign q2_4 = mode_reg ? 512: 512;
+assign q2_5 = mode_reg ? 512: 512;
+assign q2_6 = mode_reg ? 512: 512;
+assign q2_7 = mode_reg ? 512: 512;
+assign q2_8 = mode_reg ? 512: 512;
+assign q3_1 = mode_reg ? 64: 64;
+assign q3_2 = mode_reg ? 512: 512;
+assign q3_3 = mode_reg ? 512: 512;
+assign q3_4 = mode_reg ? 512: 512;
+assign q3_5 = mode_reg ? 512: 512;
+assign q3_6 = mode_reg ? 512: 512;
+assign q3_7 = mode_reg ? 512: 512;
+assign q3_8 = mode_reg ? 512: 512;
+assign q4_1 = mode_reg ? 512: 512;
+assign q4_2 = mode_reg ? 512: 512;
+assign q4_3 = mode_reg ? 512: 512;
+assign q4_4 = mode_reg ? 512: 512;
+assign q4_5 = mode_reg ? 512: 512;
+assign q4_6 = mode_reg ? 512: 512;
+assign q4_7 = mode_reg ? 512: 512;
+assign q4_8 = mode_reg ? 512: 512;
+assign q5_1 = mode_reg ? 512: 512;
+assign q5_2 = mode_reg ? 512: 512;
+assign q5_3 = mode_reg ? 512: 512;
+assign q5_4 = mode_reg ? 512: 512;
+assign q5_5 = mode_reg ? 512: 16;
+assign q5_6 = mode_reg ? 512: 512;
+assign q5_7 = mode_reg ? 512: 512;
+assign q5_8 = mode_reg ? 512: 512;
+assign q6_1 = mode_reg ? 512: 512;
+assign q6_2 = mode_reg ? 512: 512;
+assign q6_3 = mode_reg ? 512: 512;
+assign q6_4 = mode_reg ? 512: 512;
+assign q6_5 = mode_reg ? 512: 512;
+assign q6_6 = mode_reg ? 512: 512;
+assign q6_7 = mode_reg ? 512: 512;
+assign q6_8 = mode_reg ? 512: 512;
+assign q7_1 = mode_reg ? 512: 512;
+assign q7_2 = mode_reg ? 512: 512;
+assign q7_3 = mode_reg ? 512: 512;
+assign q7_4 = mode_reg ? 512: 512;
+assign q7_5 = mode_reg ? 512: 512;
+assign q7_6 = mode_reg ? 512: 512;
+assign q7_7 = mode_reg ? 512: 512;
+assign q7_8 = mode_reg ? 512: 512;
+assign q8_1 = mode_reg ? 512: 512;
+assign q8_2 = mode_reg ? 512: 512;
+assign q8_3 = mode_reg ? 512: 512;
+assign q8_4 = mode_reg ? 512: 512;
+assign q8_5 = mode_reg ? 512: 512;
+assign q8_6 = mode_reg ? 512: 512;
+assign q8_7 = mode_reg ? 512: 512;
+assign q8_8 = mode_reg ? 512: 512;
 // End of quantization Values
 
 
@@ -240,11 +251,12 @@ reg [`N+`M:0] dct61_temp, dct62_temp, dct63_temp, dct64_temp, dct65_temp, dct66_
 reg [`N+`M:0] dct71_temp, dct72_temp, dct73_temp, dct74_temp, dct75_temp, dct76_temp, dct77_temp, dct78_temp;
 reg [`N+`M:0] dct81_temp, dct82_temp, dct83_temp, dct84_temp, dct85_temp, dct86_temp, dct87_temp, dct88_temp;
 
-reg [`N:0] zig_zag [0:63];
-reg non_zero [0:63];
+always @(posedge clk) begin
+	if(~srst_n) mode_reg <= 0;
+	else mode_reg <= mode;
+end
 
-always @(posedge clk)
-begin
+always @(posedge clk) begin
 	if (~srst_n) begin
 		dct11_temp <= 0; dct12_temp <= 0; dct13_temp <= 0; dct14_temp <= 0;
 		dct15_temp <= 0; dct16_temp <= 0; dct17_temp <= 0; dct18_temp <= 0; 
@@ -494,70 +506,70 @@ always @(posedge clk) begin
 		q81 <= 0; q82 <= 0; q83 <= 0; q84 <= 0; q85 <= 0; q86 <= 0; q87 <= 0; q88 <= 0;
 	end else if (enable_2) begin
 		// rounding q11 based on the bit in the 11th place of dct11_temp	
-		q11 <= q11_temp[`N+1] ? q11_temp[`N+`M:`M] + 1 : q11_temp[`N+`M:`M];
-		q12 <= q12_temp[`N+1] ? q12_temp[`N+`M:`M] + 1 : q12_temp[`N+`M:`M];
-		q13 <= q13_temp[`N+1] ? q13_temp[`N+`M:`M] + 1 : q13_temp[`N+`M:`M];
-		q14 <= q14_temp[`N+1] ? q14_temp[`N+`M:`M] + 1 : q14_temp[`N+`M:`M];
-		q15 <= q15_temp[`N+1] ? q15_temp[`N+`M:`M] + 1 : q15_temp[`N+`M:`M];
-		q16 <= q16_temp[`N+1] ? q16_temp[`N+`M:`M] + 1 : q16_temp[`N+`M:`M];
-		q17 <= q17_temp[`N+1] ? q17_temp[`N+`M:`M] + 1 : q17_temp[`N+`M:`M];
-		q18 <= q18_temp[`N+1] ? q18_temp[`N+`M:`M] + 1 : q18_temp[`N+`M:`M];
-		q21 <= q21_temp[`N+1] ? q21_temp[`N+`M:`M] + 1 : q21_temp[`N+`M:`M];
-		q22 <= q22_temp[`N+1] ? q22_temp[`N+`M:`M] + 1 : q22_temp[`N+`M:`M];
-		q23 <= q23_temp[`N+1] ? q23_temp[`N+`M:`M] + 1 : q23_temp[`N+`M:`M];
-		q24 <= q24_temp[`N+1] ? q24_temp[`N+`M:`M] + 1 : q24_temp[`N+`M:`M];
-		q25 <= q25_temp[`N+1] ? q25_temp[`N+`M:`M] + 1 : q25_temp[`N+`M:`M];
-		q26 <= q26_temp[`N+1] ? q26_temp[`N+`M:`M] + 1 : q26_temp[`N+`M:`M];
-		q27 <= q27_temp[`N+1] ? q27_temp[`N+`M:`M] + 1 : q27_temp[`N+`M:`M];
-		q28 <= q28_temp[`N+1] ? q28_temp[`N+`M:`M] + 1 : q28_temp[`N+`M:`M];
-		q31 <= q31_temp[`N+1] ? q31_temp[`N+`M:`M] + 1 : q31_temp[`N+`M:`M];
-		q32 <= q32_temp[`N+1] ? q32_temp[`N+`M:`M] + 1 : q32_temp[`N+`M:`M];
-		q33 <= q33_temp[`N+1] ? q33_temp[`N+`M:`M] + 1 : q33_temp[`N+`M:`M];
-		q34 <= q34_temp[`N+1] ? q34_temp[`N+`M:`M] + 1 : q34_temp[`N+`M:`M];
-		q35 <= q35_temp[`N+1] ? q35_temp[`N+`M:`M] + 1 : q35_temp[`N+`M:`M];
-		q36 <= q36_temp[`N+1] ? q36_temp[`N+`M:`M] + 1 : q36_temp[`N+`M:`M];
-		q37 <= q37_temp[`N+1] ? q37_temp[`N+`M:`M] + 1 : q37_temp[`N+`M:`M];
-		q38 <= q38_temp[`N+1] ? q38_temp[`N+`M:`M] + 1 : q38_temp[`N+`M:`M];
-		q41 <= q41_temp[`N+1] ? q41_temp[`N+`M:`M] + 1 : q41_temp[`N+`M:`M];
-		q42 <= q42_temp[`N+1] ? q42_temp[`N+`M:`M] + 1 : q42_temp[`N+`M:`M];
-		q43 <= q43_temp[`N+1] ? q43_temp[`N+`M:`M] + 1 : q43_temp[`N+`M:`M];
-		q44 <= q44_temp[`N+1] ? q44_temp[`N+`M:`M] + 1 : q44_temp[`N+`M:`M];
-		q45 <= q45_temp[`N+1] ? q45_temp[`N+`M:`M] + 1 : q45_temp[`N+`M:`M];
-		q46 <= q46_temp[`N+1] ? q46_temp[`N+`M:`M] + 1 : q46_temp[`N+`M:`M];
-		q47 <= q47_temp[`N+1] ? q47_temp[`N+`M:`M] + 1 : q47_temp[`N+`M:`M];
-		q48 <= q48_temp[`N+1] ? q48_temp[`N+`M:`M] + 1 : q48_temp[`N+`M:`M];
-		q51 <= q51_temp[`N+1] ? q51_temp[`N+`M:`M] + 1 : q51_temp[`N+`M:`M];
-		q52 <= q52_temp[`N+1] ? q52_temp[`N+`M:`M] + 1 : q52_temp[`N+`M:`M];
-		q53 <= q53_temp[`N+1] ? q53_temp[`N+`M:`M] + 1 : q53_temp[`N+`M:`M];
-		q54 <= q54_temp[`N+1] ? q54_temp[`N+`M:`M] + 1 : q54_temp[`N+`M:`M];
-		q55 <= q55_temp[`N+1] ? q55_temp[`N+`M:`M] + 1 : q55_temp[`N+`M:`M];
-		q56 <= q56_temp[`N+1] ? q56_temp[`N+`M:`M] + 1 : q56_temp[`N+`M:`M];
-		q57 <= q57_temp[`N+1] ? q57_temp[`N+`M:`M] + 1 : q57_temp[`N+`M:`M];
-		q58 <= q58_temp[`N+1] ? q58_temp[`N+`M:`M] + 1 : q58_temp[`N+`M:`M];
-		q61 <= q61_temp[`N+1] ? q61_temp[`N+`M:`M] + 1 : q61_temp[`N+`M:`M];
-		q62 <= q62_temp[`N+1] ? q62_temp[`N+`M:`M] + 1 : q62_temp[`N+`M:`M];
-		q63 <= q63_temp[`N+1] ? q63_temp[`N+`M:`M] + 1 : q63_temp[`N+`M:`M];
-		q64 <= q64_temp[`N+1] ? q64_temp[`N+`M:`M] + 1 : q64_temp[`N+`M:`M];
-		q65 <= q65_temp[`N+1] ? q65_temp[`N+`M:`M] + 1 : q65_temp[`N+`M:`M];
-		q66 <= q66_temp[`N+1] ? q66_temp[`N+`M:`M] + 1 : q66_temp[`N+`M:`M];
-		q67 <= q67_temp[`N+1] ? q67_temp[`N+`M:`M] + 1 : q67_temp[`N+`M:`M];
-		q68 <= q68_temp[`N+1] ? q68_temp[`N+`M:`M] + 1 : q68_temp[`N+`M:`M];
-		q71 <= q71_temp[`N+1] ? q71_temp[`N+`M:`M] + 1 : q71_temp[`N+`M:`M];
-		q72 <= q72_temp[`N+1] ? q72_temp[`N+`M:`M] + 1 : q72_temp[`N+`M:`M];
-		q73 <= q73_temp[`N+1] ? q73_temp[`N+`M:`M] + 1 : q73_temp[`N+`M:`M];
-		q74 <= q74_temp[`N+1] ? q74_temp[`N+`M:`M] + 1 : q74_temp[`N+`M:`M];
-		q75 <= q75_temp[`N+1] ? q75_temp[`N+`M:`M] + 1 : q75_temp[`N+`M:`M];
-		q76 <= q76_temp[`N+1] ? q76_temp[`N+`M:`M] + 1 : q76_temp[`N+`M:`M];
-		q77 <= q77_temp[`N+1] ? q77_temp[`N+`M:`M] + 1 : q77_temp[`N+`M:`M];
-		q78 <= q78_temp[`N+1] ? q78_temp[`N+`M:`M] + 1 : q78_temp[`N+`M:`M];
-		q81 <= q81_temp[`N+1] ? q81_temp[`N+`M:`M] + 1 : q81_temp[`N+`M:`M];
-		q82 <= q82_temp[`N+1] ? q82_temp[`N+`M:`M] + 1 : q82_temp[`N+`M:`M];
-		q83 <= q83_temp[`N+1] ? q83_temp[`N+`M:`M] + 1 : q83_temp[`N+`M:`M];
-		q84 <= q84_temp[`N+1] ? q84_temp[`N+`M:`M] + 1 : q84_temp[`N+`M:`M];
-		q85 <= q85_temp[`N+1] ? q85_temp[`N+`M:`M] + 1 : q85_temp[`N+`M:`M];
-		q86 <= q86_temp[`N+1] ? q86_temp[`N+`M:`M] + 1 : q86_temp[`N+`M:`M];
-		q87 <= q87_temp[`N+1] ? q87_temp[`N+`M:`M] + 1 : q87_temp[`N+`M:`M];
-		q88 <= q88_temp[`N+1] ? q88_temp[`N+`M:`M] + 1 : q88_temp[`N+`M:`M];
+		q11 <= q11_temp[`N+1] + q11_temp[`N+`M:`M];
+		q12 <= q12_temp[`N+1] + q12_temp[`N+`M:`M];
+		q13 <= q13_temp[`N+1] + q13_temp[`N+`M:`M];
+		q14 <= q14_temp[`N+1] + q14_temp[`N+`M:`M];
+		q15 <= q15_temp[`N+1] + q15_temp[`N+`M:`M];
+		q16 <= q16_temp[`N+1] + q16_temp[`N+`M:`M];
+		q17 <= q17_temp[`N+1] + q17_temp[`N+`M:`M];
+		q18 <= q18_temp[`N+1] + q18_temp[`N+`M:`M];
+		q21 <= q21_temp[`N+1] + q21_temp[`N+`M:`M];
+		q22 <= q22_temp[`N+1] + q22_temp[`N+`M:`M];
+		q23 <= q23_temp[`N+1] + q23_temp[`N+`M:`M];
+		q24 <= q24_temp[`N+1] + q24_temp[`N+`M:`M];
+		q25 <= q25_temp[`N+1] + q25_temp[`N+`M:`M];
+		q26 <= q26_temp[`N+1] + q26_temp[`N+`M:`M];
+		q27 <= q27_temp[`N+1] + q27_temp[`N+`M:`M];
+		q28 <= q28_temp[`N+1] + q28_temp[`N+`M:`M];
+		q31 <= q31_temp[`N+1] + q31_temp[`N+`M:`M];
+		q32 <= q32_temp[`N+1] + q32_temp[`N+`M:`M];
+		q33 <= q33_temp[`N+1] + q33_temp[`N+`M:`M];
+		q34 <= q34_temp[`N+1] + q34_temp[`N+`M:`M];
+		q35 <= q35_temp[`N+1] + q35_temp[`N+`M:`M];
+		q36 <= q36_temp[`N+1] + q36_temp[`N+`M:`M];
+		q37 <= q37_temp[`N+1] + q37_temp[`N+`M:`M];
+		q38 <= q38_temp[`N+1] + q38_temp[`N+`M:`M];
+		q41 <= q41_temp[`N+1] + q41_temp[`N+`M:`M];
+		q42 <= q42_temp[`N+1] + q42_temp[`N+`M:`M];
+		q43 <= q43_temp[`N+1] + q43_temp[`N+`M:`M];
+		q44 <= q44_temp[`N+1] + q44_temp[`N+`M:`M];
+		q45 <= q45_temp[`N+1] + q45_temp[`N+`M:`M];
+		q46 <= q46_temp[`N+1] + q46_temp[`N+`M:`M];
+		q47 <= q47_temp[`N+1] + q47_temp[`N+`M:`M];
+		q48 <= q48_temp[`N+1] + q48_temp[`N+`M:`M];
+		q51 <= q51_temp[`N+1] + q51_temp[`N+`M:`M];
+		q52 <= q52_temp[`N+1] + q52_temp[`N+`M:`M];
+		q53 <= q53_temp[`N+1] + q53_temp[`N+`M:`M];
+		q54 <= q54_temp[`N+1] + q54_temp[`N+`M:`M];
+		q55 <= q55_temp[`N+1] + q55_temp[`N+`M:`M];
+		q56 <= q56_temp[`N+1] + q56_temp[`N+`M:`M];
+		q57 <= q57_temp[`N+1] + q57_temp[`N+`M:`M];
+		q58 <= q58_temp[`N+1] + q58_temp[`N+`M:`M];
+		q61 <= q61_temp[`N+1] + q61_temp[`N+`M:`M];
+		q62 <= q62_temp[`N+1] + q62_temp[`N+`M:`M];
+		q63 <= q63_temp[`N+1] + q63_temp[`N+`M:`M];
+		q64 <= q64_temp[`N+1] + q64_temp[`N+`M:`M];
+		q65 <= q65_temp[`N+1] + q65_temp[`N+`M:`M];
+		q66 <= q66_temp[`N+1] + q66_temp[`N+`M:`M];
+		q67 <= q67_temp[`N+1] + q67_temp[`N+`M:`M];
+		q68 <= q68_temp[`N+1] + q68_temp[`N+`M:`M];
+		q71 <= q71_temp[`N+1] + q71_temp[`N+`M:`M];
+		q72 <= q72_temp[`N+1] + q72_temp[`N+`M:`M];
+		q73 <= q73_temp[`N+1] + q73_temp[`N+`M:`M];
+		q74 <= q74_temp[`N+1] + q74_temp[`N+`M:`M];
+		q75 <= q75_temp[`N+1] + q75_temp[`N+`M:`M];
+		q76 <= q76_temp[`N+1] + q76_temp[`N+`M:`M];
+		q77 <= q77_temp[`N+1] + q77_temp[`N+`M:`M];
+		q78 <= q78_temp[`N+1] + q78_temp[`N+`M:`M];
+		q81 <= q81_temp[`N+1] + q81_temp[`N+`M:`M];
+		q82 <= q82_temp[`N+1] + q82_temp[`N+`M:`M];
+		q83 <= q83_temp[`N+1] + q83_temp[`N+`M:`M];
+		q84 <= q84_temp[`N+1] + q84_temp[`N+`M:`M];
+		q85 <= q85_temp[`N+1] + q85_temp[`N+`M:`M];
+		q86 <= q86_temp[`N+1] + q86_temp[`N+`M:`M];
+		q87 <= q87_temp[`N+1] + q87_temp[`N+`M:`M];
+		q88 <= q88_temp[`N+1] + q88_temp[`N+`M:`M];
 	end
 end	 
 
@@ -576,142 +588,6 @@ always @(posedge clk) begin
 		vaild <= enable_3;
 		end
 end	
-
-always @(*) begin
-	zig_zag[0] = q11;
-	zig_zag[1] = q12;
-	zig_zag[2] = q21;
-	zig_zag[3] = q31;
-	zig_zag[4] = q22;
-	zig_zag[5] = q13;
-	zig_zag[6] = q14;
-	zig_zag[7] = q23;
-	zig_zag[8] = q32;
-	zig_zag[9] = q41;
-	zig_zag[10] = q51;
-	zig_zag[11] = q42;
-	zig_zag[12] = q33;
-	zig_zag[13] = q24;
-	zig_zag[14] = q15;
-	zig_zag[15] = q16;
-	zig_zag[16] = q25;
-	zig_zag[17] = q34;
-	zig_zag[18] = q43;
-	zig_zag[19] = q52;
-	zig_zag[20] = q61;
-	zig_zag[21] = q71;
-	zig_zag[22] = q62;
-	zig_zag[23] = q53;
-	zig_zag[24] = q44;
-	zig_zag[25] = q35;
-	zig_zag[26] = q26;
-	zig_zag[27] = q17;
-	zig_zag[28] = q18;
-	zig_zag[29] = q27;
-	zig_zag[30] = q36;
-	zig_zag[31] = q45;
-	zig_zag[32] = q54;
-	zig_zag[33] = q63;
-	zig_zag[34] = q72;
-	zig_zag[35] = q81;
-	zig_zag[36] = q82;
-	zig_zag[37] = q73;
-	zig_zag[38] = q64;
-	zig_zag[39] = q55;
-	zig_zag[40] = q46;
-	zig_zag[41] = q37;
-	zig_zag[42] = q28;
-	zig_zag[43] = q38;
-	zig_zag[44] = q47;
-	zig_zag[45] = q56;
-	zig_zag[46] = q65;
-	zig_zag[47] = q74;
-	zig_zag[48] = q83;
-	zig_zag[49] = q84;
-	zig_zag[50] = q75;
-	zig_zag[51] = q66;
-	zig_zag[52] = q57;
-	zig_zag[53] = q48;
-	zig_zag[54] = q58;
-	zig_zag[55] = q67;
-	zig_zag[56] = q76;
-	zig_zag[57] = q85;
-	zig_zag[58] = q86;
-	zig_zag[59] = q77;
-	zig_zag[60] = q68;
-	zig_zag[61] = q87;
-	zig_zag[62] = q78;
-	zig_zag[63] = q88;
-end
-
-integer i,j, number,pre;
-reg [60-1:0] R;
-reg [60-1:0] L;
-reg [8-1:0] WW [0:63];
-
-always @(*) begin
-	
-	if (vaild == 1) begin
-		number = 0;
-		for (i = 0; i < 64; i=i+1) begin
-			if (zig_zag[i] != 0) begin
-				WW[number] = i;
-				number = number + 1'b1;
-			end
-		end
-		for (i = 0; i < 64; i=i+1) begin
-			if(i >= number) WW[i] = 200;
-		end
-
-		R[3:0] = WW[1] == 200 ? 0 : WW[1] - WW[0] - 1;
-		L[3:0] = WW[1] == 200 ? 0 : zig_zag[WW[1]];
-
-		R[7:4] = WW[2] == 200 ? 0 : WW[2] - WW[1] - 1;
-		L[7:4] = WW[2] == 200 ? 0 : zig_zag[WW[2]];
-
-		R[11:8] = WW[3] == 200 ? 0 : WW[3] - WW[2] - 1;
-		L[11:8] = WW[3] == 200 ? 0 : zig_zag[WW[3]];
-
-		R[15:12] = WW[4] == 200 ? 0 : WW[4] - WW[3] - 1;
-		L[15:12] = WW[4] == 200 ? 0 : zig_zag[WW[4]];
-
-		R[19:16] = WW[5] == 200 ? 0 : WW[5] - WW[4] - 1;
-		L[19:16] = WW[5] == 200 ? 0 : zig_zag[WW[5]];
-
-		R[23:20] = WW[6] == 200 ? 0 : WW[6] - WW[5] - 1;
-		L[23:20] = WW[6] == 200 ? 0 : zig_zag[WW[6]];
-
-		R[27:24] = WW[7] == 200 ? 0 : WW[7] - WW[6] - 1;
-		L[27:24] = WW[7] == 200 ? 0 : zig_zag[WW[7]];
-
-		R[31:28] = WW[8] == 200 ? 0 : WW[8] - WW[7] - 1;
-		L[31:28] = WW[8] == 200 ? 0 : zig_zag[WW[8]];
-
-		R[35:32] = WW[9] == 200 ? 0 : WW[9] - WW[8] - 1;
-		L[35:32] = WW[9] == 200 ? 0 : zig_zag[WW[9]];
-
-		R[39:36] = WW[10] == 200 ? 0 : WW[10] - WW[9] - 1;
-		L[39:36] = WW[10] == 200 ? 0 : zig_zag[WW[10]];
-
-		R[43:40] = WW[11] == 200 ? 0 : WW[11] - WW[10] - 1;
-		L[43:40] = WW[11] == 200 ? 0 : zig_zag[WW[11]];
-
-		R[47:44] = WW[12] == 200 ? 0 : WW[12] - WW[11] - 1;
-		L[47:44] = WW[12] == 200 ? 0 : zig_zag[WW[12]];
-
-		R[51:48] = WW[13] == 200 ? 0 : WW[13] - WW[12] - 1;
-		L[51:48] = WW[13] == 200 ? 0 : zig_zag[WW[13]];
-
-		R[55:52] = WW[14] == 200 ? 0 : WW[14] - WW[13] - 1;
-		L[55:52] = WW[14] == 200 ? 0 : zig_zag[WW[14]];
-
-		R[59:56] = WW[15] == 200 ? 0 : WW[15] - WW[14] - 1;
-		L[59:56] = WW[15] == 200 ? 0 : zig_zag[WW[15]];
-
-	end
-
-end
-
 
 
 endmodule
