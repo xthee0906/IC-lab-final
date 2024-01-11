@@ -14,22 +14,23 @@ module RLC(
 	input   [`N:0]  q81, q82, q83, q84, q85, q86, q87, q88,
 	input  enable,
     output reg [`N:0] DC_reg,
-	output reg [32-1:0] R_reg,
+	output reg [24-1:0] R_reg,
 	output reg [32-1:0] L_reg,
 	output reg [32-1:0] F_reg,
-    output reg [10-1:0] sram_waddr,
-    output reg [107-1:0] sram_wdata,
+    output reg [11-1:0] sram_waddr,
+    output reg [99-1:0] sram_wdata,
     output reg wen,
     output reg vaild
     
 );
 
-reg [11:0] sram_waddr_next;
+reg [11-1:0] sram_waddr_next;
 reg wen_reg;
+reg vaild_ff;
 
 wire [`N:0] zig_zag [0:63];
 integer i, number;
-reg [4-1:0] R [0:7];
+reg [3-1:0] R [0:7];
 reg [4-1:0] L [0:7];
 reg [4-1:0] F [0:7];
 reg [8-1:0] WW [0:63];
@@ -103,6 +104,13 @@ assign	zig_zag[62] = q78;
 assign	zig_zag[63] = q88;
 // end
 
+always @(*) begin
+	if (sram_waddr == 11'd1729) begin
+		vaild_ff = 1;
+	end else begin
+		vaild_ff = vaild;
+	end
+end
 
 always @(posedge clk) begin
 	if (~srst_n) begin
@@ -110,16 +118,16 @@ always @(posedge clk) begin
         R_reg <= 0;
 		L_reg <= 0;
 		F_reg <= 0;
-        vaild <= 0;
         sram_wdata <= 0;
         sram_waddr <= -1;
         wen <= 1;
+		vaild <= 0;
 	end else begin
         DC_reg <= DC;
 		R_reg <= {R[7], R[6], R[5], R[4], R[3], R[2], R[1], R[0]};
 		L_reg <= {L[7], L[6], L[5], L[4], L[3], L[2], L[1], L[0]};
 		F_reg <= {F[7], F[6], F[5], F[4], F[3], F[2], F[1], F[0]};
-        vaild <= enable;
+		vaild <= vaild_ff;
         sram_wdata <= {DC, R[7], R[6], R[5], R[4], R[3], R[2], R[1], R[0], L[7], L[6], L[5], L[4], L[3], L[2], L[1], L[0], F[7], F[6], F[5], F[4], F[3], F[2], F[1], F[0]};
         sram_waddr <= sram_waddr_next;
         wen <= wen_reg;
@@ -128,9 +136,10 @@ end
 
 always @(*) begin
 	if (enable) begin
-		number = 0;
-		for (i = 0; i < 9; i=i+1) WW[i] = 200;
-		for (i = 0; i < 9; i=i+1) begin
+		number = 1;
+		WW[0] = 0;
+		for (i = 1; i < 9; i=i+1) WW[i] = 200;
+		for (i = 1; i < 9; i=i+1) begin
 			if (zig_zag[i] != 0) begin
 				WW[number] = i;
 				number = number + 1'b1;
@@ -146,8 +155,12 @@ always @(*) begin
     end
 end
 
+// w[0] = 0 -- DC != 0
+// w[0] = 1 -- DC == 0
+
 always @(*) begin
     if (enable) begin
+
 		R[0] = WW[1] == 200 ? 0 : WW[1] - WW[0] - 1;
 		L[0] = WW[1] == 200 ? 0 : zig_zag[WW[1]];
 		F[0] = 1;
