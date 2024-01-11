@@ -16,11 +16,11 @@ module top(
 	input  [`N:0]  dct81, dct82, dct83, dct84, dct85, dct86, dct87, dct88,
 	output vaild,
 	output  [`N:0] DC,
-	output  [32-1:0] R,
+	output  [24-1:0] R,
 	output  [32-1:0] L,
 	output  [32-1:0] F,
-	output  [10-1:0] sram_waddr,
-    output  [107-1:0] sram_wdata,
+	output  [11-1:0] sram_waddr,
+    output  [99-1:0] sram_wdata,
     output  wen
 );
 
