@@ -57,7 +57,7 @@ def CheckValue(image, channel):
                 a = 0
 
 
-###### decode ########
+###### decode #######
 def hex_to_decimal_4bit(hex_value):
     # Check if the hex string is valid
     if not all(c in "0123456789abcdefABCDEF" for c in hex_value):
@@ -307,18 +307,40 @@ code_Y_table, len_Y_table, code_Y_arrays, len_Y_arrays, DC_code_Y_array = read_f
                                                                         length_path = './dataset/len.txt', 
                                                                         DC_code_path = './dataset/code_DC.txt' , 
                                                                         DC_length_path = './dataset/len_DC.txt')    
-
-
 DC_decimal_Y = DC_decoder(DC_code_Y_array)
 Q_image_Y = AC_decoder(code_Y_table, len_Y_table, code_Y_arrays, len_Y_arrays, DC_decimal_Y)
 
+code_Cb_table, len_Cb_table, code_Cb_arrays, len_Cb_arrays, DC_code_Cb_array = read_file(code_table_path = './dataset/code_table_Cb.txt', 
+                                                                        length_table_path = './dataset/len_table_Cb.txt', 
+                                                                        code_path = './dataset/code_Cb.txt', 
+                                                                        length_path = './dataset/len_Cb.txt', 
+                                                                        DC_code_path = './dataset/code_DC_Cb.txt' , 
+                                                                        DC_length_path = './dataset/len_DC_Cb.txt')    
+DC_decimal_Cb = DC_decoder(DC_code_Cb_array)
+Q_image_Cb = AC_decoder(code_Cb_table, len_Cb_table, code_Cb_arrays, len_Cb_arrays, DC_decimal_Cb)
+
+code_Cr_table, len_Cr_table, code_Cr_arrays, len_Cr_arrays, DC_code_Cr_array = read_file(code_table_path = './dataset/code_table_Cr.txt', 
+                                                                        length_table_path = './dataset/len_table_Cr.txt', 
+                                                                        code_path = './dataset/code_Cr.txt', 
+                                                                        length_path = './dataset/len_Cr.txt', 
+                                                                        DC_code_path = './dataset/code_DC_Cr.txt' , 
+                                                                        DC_length_path = './dataset/len_DC_Cr.txt')    
+DC_decimal_Cr = DC_decoder(DC_code_Cr_array)
+Q_image_Cr = AC_decoder(code_Cr_table, len_Cr_table, code_Cr_arrays, len_Cr_arrays, DC_decimal_Cr)
+
+
+
+Q_image = np.zeros((144, 256, 3), dtype=int)
+Q_image[:,:,0] = Q_image_Y[:,:,0]
+Q_image[:,:,1] = Q_image_Cr[:,:,0]
+Q_image[:,:,2] = Q_image_Cb[:,:,0]
 
 ########## vis ###########
-CheckValue(Q_image_Y,0)
+CheckValue(Q_image,2)
 Q = np.array([
-    [  16,  64,  512, 512, 512, 512, 512, 512],
+    [  16,  64,  64, 64, 512, 512, 512, 512],
+    [ 32,  64, 64, 512, 512, 512, 512, 512],
     [ 64,  512, 512, 512, 512, 512, 512, 512],
-    [ 512,  512, 512, 512, 512, 512, 512, 512],
     [512, 512, 512, 512, 512, 512, 512, 512],
     [512, 512, 512, 512, 512, 512, 512, 512],
     [512, 512, 512, 512, 512, 512, 512, 512],
@@ -327,7 +349,7 @@ Q = np.array([
 ])
 
 
-iDCT_image = iDCT_matrix_ver(Q_image_Y)
+iDCT_image = iDCT_matrix_ver(Q_image)
 iDCT_image = cv2.cvtColor(iDCT_image, cv2.COLOR_YCrCb2BGR)    # to YCbCr
 
 cv2.imshow('iDCT', iDCT_image)
