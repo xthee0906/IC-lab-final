@@ -22,8 +22,9 @@ module quantizer(
 	output reg  [`N:0]  q61, q62, q63, q64, q65, q66, q67, q68,
 	output reg  [`N:0]  q71, q72, q73, q74, q75, q76, q77, q78,
 	output reg  [`N:0]  q81, q82, q83, q84, q85, q86, q87, q88,
-	output reg  vaild
+	output reg  valid
 );
+
 reg mode_reg;
 
 wire [10:0] q1_1, q1_2, q1_3, q1_4, q1_5, q1_6, q1_7, q1_8;
@@ -36,22 +37,22 @@ wire [10:0] q7_1, q7_2, q7_3, q7_4, q7_5, q7_6, q7_7, q7_8;
 wire [10:0] q8_1, q8_2, q8_3, q8_4, q8_5, q8_6, q8_7, q8_8;
 
 assign q1_1 = mode_reg ? 16: 16;
-assign q1_2 = mode_reg ? 32: 32;
-assign q1_3 = mode_reg ? 64: 64;
-assign q1_4 = mode_reg ? 64: 128;
+assign q1_2 = mode_reg ? 64: 32;
+assign q1_3 = mode_reg ? 512: 64;
+assign q1_4 = mode_reg ? 512: 128;
 assign q1_5 = mode_reg ? 512: 512;
 assign q1_6 = mode_reg ? 512: 512;
 assign q1_7 = mode_reg ? 512: 512;
 assign q1_8 = mode_reg ? 512: 512;
-assign q2_1 = mode_reg ? 32: 32;
-assign q2_2 = mode_reg ? 64: 64;
-assign q2_3 = mode_reg ? 64: 512;
+assign q2_1 = mode_reg ? 64: 32;
+assign q2_2 = mode_reg ? 512: 64;
+assign q2_3 = mode_reg ? 512: 512;
 assign q2_4 = mode_reg ? 512: 512;
 assign q2_5 = mode_reg ? 512: 512;
 assign q2_6 = mode_reg ? 512: 512;
 assign q2_7 = mode_reg ? 512: 512;
 assign q2_8 = mode_reg ? 512: 512;
-assign q3_1 = mode_reg ? 64: 64;
+assign q3_1 = mode_reg ? 512: 64;
 assign q3_2 = mode_reg ? 512: 512;
 assign q3_3 = mode_reg ? 512: 512;
 assign q3_4 = mode_reg ? 512: 512;
@@ -71,7 +72,7 @@ assign q5_1 = mode_reg ? 512: 512;
 assign q5_2 = mode_reg ? 512: 512;
 assign q5_3 = mode_reg ? 512: 512;
 assign q5_4 = mode_reg ? 512: 512;
-assign q5_5 = mode_reg ? 512: 16;
+assign q5_5 = mode_reg ? 512: 512;
 assign q5_6 = mode_reg ? 512: 512;
 assign q5_7 = mode_reg ? 512: 512;
 assign q5_8 = mode_reg ? 512: 512;
@@ -99,7 +100,6 @@ assign q8_5 = mode_reg ? 512: 512;
 assign q8_6 = mode_reg ? 512: 512;
 assign q8_7 = mode_reg ? 512: 512;
 assign q8_8 = mode_reg ? 512: 512;
-// End of quantization Values
 
 
 wire [`M:0] qM1_1;
@@ -241,7 +241,7 @@ reg [`N+`M:0] q61_temp, q62_temp, q63_temp, q64_temp, q65_temp, q66_temp, q67_te
 reg [`N+`M:0] q71_temp, q72_temp, q73_temp, q74_temp, q75_temp, q76_temp, q77_temp, q78_temp;
 reg [`N+`M:0] q81_temp, q82_temp, q83_temp, q84_temp, q85_temp, q86_temp, q87_temp, q88_temp;
 
-reg enable_1, enable_2, enable_3;
+reg enable_1, enable_2;
 reg [`N+`M:0] dct11_temp, dct12_temp, dct13_temp, dct14_temp, dct15_temp, dct16_temp, dct17_temp, dct18_temp;
 reg [`N+`M:0] dct21_temp, dct22_temp, dct23_temp, dct24_temp, dct25_temp, dct26_temp, dct27_temp, dct28_temp;
 reg [`N+`M:0] dct31_temp, dct32_temp, dct33_temp, dct34_temp, dct35_temp, dct36_temp, dct37_temp, dct38_temp;
@@ -258,40 +258,80 @@ end
 
 always @(posedge clk) begin
 	if (~srst_n) begin
-		dct11_temp <= 0; dct12_temp <= 0; dct13_temp <= 0; dct14_temp <= 0;
-		dct15_temp <= 0; dct16_temp <= 0; dct17_temp <= 0; dct18_temp <= 0; 
-		dct21_temp <= 0; dct22_temp <= 0; dct23_temp <= 0; dct24_temp <= 0;
-		dct25_temp <= 0; dct26_temp <= 0; dct27_temp <= 0; dct28_temp <= 0;
-		dct31_temp <= 0; dct32_temp <= 0; dct33_temp <= 0; dct34_temp <= 0;
-		dct35_temp <= 0; dct36_temp <= 0; dct37_temp <= 0; dct38_temp <= 0;
-		dct41_temp <= 0; dct42_temp <= 0; dct43_temp <= 0; dct44_temp <= 0;
-		dct45_temp <= 0; dct46_temp <= 0; dct47_temp <= 0; dct48_temp <= 0;
-		dct51_temp <= 0; dct52_temp <= 0; dct53_temp <= 0; dct54_temp <= 0;
-		dct55_temp <= 0; dct56_temp <= 0; dct57_temp <= 0; dct58_temp <= 0;
-		dct61_temp <= 0; dct62_temp <= 0; dct63_temp <= 0; dct64_temp <= 0;
-		dct65_temp <= 0; dct66_temp <= 0; dct67_temp <= 0; dct68_temp <= 0;
-		dct71_temp <= 0; dct72_temp <= 0; dct73_temp <= 0; dct74_temp <= 0;
-		dct75_temp <= 0; dct76_temp <= 0; dct77_temp <= 0; dct78_temp <= 0;
-		dct81_temp <= 0; dct82_temp <= 0; dct83_temp <= 0; dct84_temp <= 0;
-		dct85_temp <= 0; dct86_temp <= 0; dct87_temp <= 0; dct88_temp <= 0;
+		dct11_temp <= 0; dct12_temp <= 0; dct13_temp <= 0; dct14_temp <= 0; dct15_temp <= 0; dct16_temp <= 0; dct17_temp <= 0; dct18_temp <= 0; 
+		dct21_temp <= 0; dct22_temp <= 0; dct23_temp <= 0; dct24_temp <= 0; dct25_temp <= 0; dct26_temp <= 0; dct27_temp <= 0; dct28_temp <= 0;
+		dct31_temp <= 0; dct32_temp <= 0; dct33_temp <= 0; dct34_temp <= 0; dct35_temp <= 0; dct36_temp <= 0; dct37_temp <= 0; dct38_temp <= 0;
+		dct41_temp <= 0; dct42_temp <= 0; dct43_temp <= 0; dct44_temp <= 0; dct45_temp <= 0; dct46_temp <= 0; dct47_temp <= 0; dct48_temp <= 0;
+		dct51_temp <= 0; dct52_temp <= 0; dct53_temp <= 0; dct54_temp <= 0; dct55_temp <= 0; dct56_temp <= 0; dct57_temp <= 0; dct58_temp <= 0;
+		dct61_temp <= 0; dct62_temp <= 0; dct63_temp <= 0; dct64_temp <= 0; dct65_temp <= 0; dct66_temp <= 0; dct67_temp <= 0; dct68_temp <= 0;
+		dct71_temp <= 0; dct72_temp <= 0; dct73_temp <= 0; dct74_temp <= 0; dct75_temp <= 0; dct76_temp <= 0; dct77_temp <= 0; dct78_temp <= 0;
+		dct81_temp <= 0; dct82_temp <= 0; dct83_temp <= 0; dct84_temp <= 0; dct85_temp <= 0; dct86_temp <= 0; dct87_temp <= 0; dct88_temp <= 0;
 	end else if (enable) begin
-		dct11_temp[`N:0] <= dct11; dct12_temp[`N:0] <= dct12; dct13_temp[`N:0] <= dct13; dct14_temp[`N:0] <= dct14;
-		dct15_temp[`N:0] <= dct15; dct16_temp[`N:0] <= dct16; dct17_temp[`N:0] <= dct17; dct18_temp[`N:0] <= dct18;
-		dct21_temp[`N:0] <= dct21; dct22_temp[`N:0] <= dct22; dct23_temp[`N:0] <= dct23; dct24_temp[`N:0] <= dct24;
-		dct25_temp[`N:0] <= dct25; dct26_temp[`N:0] <= dct26; dct27_temp[`N:0] <= dct27; dct28_temp[`N:0] <= dct28;
-		dct31_temp[`N:0] <= dct31; dct32_temp[`N:0] <= dct32; dct33_temp[`N:0] <= dct33; dct34_temp[`N:0] <= dct34;
-		dct35_temp[`N:0] <= dct35; dct36_temp[`N:0] <= dct36; dct37_temp[`N:0] <= dct37; dct38_temp[`N:0] <= dct38;
-		dct41_temp[`N:0] <= dct41; dct42_temp[`N:0] <= dct42; dct43_temp[`N:0] <= dct43; dct44_temp[`N:0] <= dct44;
-		dct45_temp[`N:0] <= dct45; dct46_temp[`N:0] <= dct46; dct47_temp[`N:0] <= dct47; dct48_temp[`N:0] <= dct48;
-		dct51_temp[`N:0] <= dct51; dct52_temp[`N:0] <= dct52; dct53_temp[`N:0] <= dct53; dct54_temp[`N:0] <= dct54;
-		dct55_temp[`N:0] <= dct55; dct56_temp[`N:0] <= dct56; dct57_temp[`N:0] <= dct57; dct58_temp[`N:0] <= dct58;
-		dct61_temp[`N:0] <= dct61; dct62_temp[`N:0] <= dct62; dct63_temp[`N:0] <= dct63; dct64_temp[`N:0] <= dct64;
-		dct65_temp[`N:0] <= dct65; dct66_temp[`N:0] <= dct66; dct67_temp[`N:0] <= dct67; dct68_temp[`N:0] <= dct68;
-		dct71_temp[`N:0] <= dct71; dct72_temp[`N:0] <= dct72; dct73_temp[`N:0] <= dct73; dct74_temp[`N:0] <= dct74;
-		dct75_temp[`N:0] <= dct75; dct76_temp[`N:0] <= dct76; dct77_temp[`N:0] <= dct77; dct78_temp[`N:0] <= dct78;
-		dct81_temp[`N:0] <= dct81; dct82_temp[`N:0] <= dct82; dct83_temp[`N:0] <= dct83; dct84_temp[`N:0] <= dct84;
-		dct85_temp[`N:0] <= dct85; dct86_temp[`N:0] <= dct86; dct87_temp[`N:0] <= dct87; dct88_temp[`N:0] <= dct88;
-		// sign extend to make dct11_temp a twos complement representation of dct11
+		dct11_temp[`N:0] <= dct11;
+		dct21_temp[`N:0] <= dct21;
+		dct31_temp[`N:0] <= dct31;
+		dct41_temp[`N:0] <= dct41;
+		dct51_temp[`N:0] <= dct51;
+		dct61_temp[`N:0] <= dct61;
+		dct71_temp[`N:0] <= dct71;
+		dct81_temp[`N:0] <= dct81;
+		dct12_temp[`N:0] <= dct12;
+		dct22_temp[`N:0] <= dct22;
+		dct32_temp[`N:0] <= dct32;
+		dct42_temp[`N:0] <= dct42;
+		dct52_temp[`N:0] <= dct52;
+		dct62_temp[`N:0] <= dct62;
+		dct72_temp[`N:0] <= dct72;
+		dct82_temp[`N:0] <= dct82;
+		dct13_temp[`N:0] <= dct13;
+		dct23_temp[`N:0] <= dct23;
+		dct33_temp[`N:0] <= dct33;
+		dct43_temp[`N:0] <= dct43;
+		dct53_temp[`N:0] <= dct53;
+		dct63_temp[`N:0] <= dct63;
+		dct73_temp[`N:0] <= dct73;
+		dct83_temp[`N:0] <= dct83;
+		dct14_temp[`N:0] <= dct14;
+		dct24_temp[`N:0] <= dct24;
+		dct34_temp[`N:0] <= dct34;
+		dct44_temp[`N:0] <= dct44;
+		dct54_temp[`N:0] <= dct54;
+		dct64_temp[`N:0] <= dct64;
+		dct74_temp[`N:0] <= dct74;
+		dct84_temp[`N:0] <= dct84;
+		dct15_temp[`N:0] <= dct15;
+		dct25_temp[`N:0] <= dct25;
+		dct35_temp[`N:0] <= dct35;
+		dct45_temp[`N:0] <= dct45;
+		dct55_temp[`N:0] <= dct55;
+		dct65_temp[`N:0] <= dct65;
+		dct75_temp[`N:0] <= dct75;
+		dct85_temp[`N:0] <= dct85;
+		dct16_temp[`N:0] <= dct16;
+		dct26_temp[`N:0] <= dct26;
+		dct36_temp[`N:0] <= dct36;
+		dct46_temp[`N:0] <= dct46;
+		dct56_temp[`N:0] <= dct56;
+		dct66_temp[`N:0] <= dct66;
+		dct76_temp[`N:0] <= dct76;
+		dct86_temp[`N:0] <= dct86;
+		dct17_temp[`N:0] <= dct17;
+		dct27_temp[`N:0] <= dct27;
+		dct37_temp[`N:0] <= dct37;
+		dct47_temp[`N:0] <= dct47;
+		dct57_temp[`N:0] <= dct57;
+		dct67_temp[`N:0] <= dct67;
+		dct77_temp[`N:0] <= dct77;
+		dct87_temp[`N:0] <= dct87;
+		dct18_temp[`N:0] <= dct18;
+		dct28_temp[`N:0] <= dct28;
+		dct38_temp[`N:0] <= dct38;
+		dct48_temp[`N:0] <= dct48;
+		dct58_temp[`N:0] <= dct58;
+		dct68_temp[`N:0] <= dct68;
+		dct78_temp[`N:0] <= dct78;
+		dct88_temp[`N:0] <= dct88;
+
 		dct11_temp[`N+`M:`N+1] <= dct11[`N] ? `M'b111111111111 : `M'b000000000000;
 		dct12_temp[`N+`M:`N+1] <= dct12[`N] ? `M'b111111111111 : `M'b000000000000;
 		dct13_temp[`N+`M:`N+1] <= dct13[`N] ? `M'b111111111111 : `M'b000000000000;
@@ -505,7 +545,6 @@ always @(posedge clk) begin
 		q71 <= 0; q72 <= 0; q73 <= 0; q74 <= 0; q75 <= 0; q76 <= 0; q77 <= 0; q78 <= 0;
 		q81 <= 0; q82 <= 0; q83 <= 0; q84 <= 0; q85 <= 0; q86 <= 0; q87 <= 0; q88 <= 0;
 	end else if (enable_2) begin
-		// rounding q11 based on the bit in the 11th place of dct11_temp	
 		q11 <= q11_temp[`N+1] + q11_temp[`N+`M:`M];
 		q12 <= q12_temp[`N+1] + q12_temp[`N+`M:`M];
 		q13 <= q13_temp[`N+1] + q13_temp[`N+`M:`M];
@@ -578,14 +617,12 @@ always @(posedge clk) begin
 	if (~srst_n) begin
 		enable_1 <= 0; 
 		enable_2 <= 0;
-		enable_3 <= 0;
-		vaild <= 0;
+		valid <= 0;
 		end
 	else begin
 		enable_1 <= enable; 
 		enable_2 <= enable_1;
-		enable_3 <= enable_2;
-		vaild <= enable_3;
+		valid <= enable_2;
 		end
 end	
 
